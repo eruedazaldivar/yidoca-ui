@@ -13,3 +13,7 @@ Uso:
     aplicar_estilo_yidoca()  # al inicio de cada página, tras st.set_page_config()
 
 Origen: extraído de yidoca-outreach-pipeline/core/ui_theme.py (super-demo) y promovido a librería independiente en junio 2026.
+
+## Decisiones de arquitectura
+
+Por qué esto es una librería instalable (y no CSS copiado en cada demo), por qué los tokens de diseño están aislados en una constante, y por qué el repo es público: ver docs/adr/0001-libreria-instalable-tokens-aislados.md.
