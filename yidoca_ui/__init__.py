@@ -7,6 +7,13 @@ from yidoca_ui.theme import (
     section_kicker,
     highlight_block,
     mono_caption,
+    render_score,
+    panel,
+)
+from yidoca_ui.graficos import (
+    tema_yidoca,
+    activar_tema_graficos,
+    grafico_yidoca,
 )
 
 __all__ = [
@@ -16,4 +23,9 @@ __all__ = [
     "section_kicker",
     "highlight_block",
     "mono_caption",
+    "render_score",
+    "panel",
+    "tema_yidoca",
+    "activar_tema_graficos",
+    "grafico_yidoca",
 ]

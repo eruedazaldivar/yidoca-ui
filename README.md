@@ -17,3 +17,5 @@ Origen: extraído de yidoca-outreach-pipeline/core/ui_theme.py (super-demo) y pr
 ## Decisiones de arquitectura
 
 Por qué esto es una librería instalable (y no CSS copiado en cada demo), por qué los tokens de diseño están aislados en una constante, y por qué el repo es público: ver docs/adr/0001-libreria-instalable-tokens-aislados.md.
+
+Por qué panel() envuelve el contenedor nativo de Streamlit en vez de inyectar un div propio, y por qué eso ata la versión de Streamlit: ver docs/adr/0002-panel-envuelve-contenedor-nativo-streamlit.md.

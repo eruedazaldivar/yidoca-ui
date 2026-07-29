@@ -6,3 +6,5 @@ venv/
 build/
 dist/
 .DS_Store
+_probar_*.py
+_prueba_*.py

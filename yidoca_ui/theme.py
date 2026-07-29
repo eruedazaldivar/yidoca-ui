@@ -12,6 +12,9 @@ Decisiones aplicadas:
    yidoca-highlight-block.
 """
 
+import html
+from contextlib import contextmanager
+
 import streamlit as st
 
 
@@ -361,6 +364,20 @@ def aplicar_estilo_yidoca() -> None:
             margin-bottom: 1.25rem;
         }}
 
+        /* Panel Yidoca sobre el contenedor nativo de Streamlit.
+           st.container(border=True) es lo unico que admite graficos y widgets
+           dentro; un div propio abierto y cerrado en dos llamadas no los envuelve.
+           Enganchamos por la clase que Streamlit genera desde la key (API
+           publica) y no por data-testid: el testid del contenedor con borde es
+           el mismo del bloque raiz y el de cada columna. Ver panel(). */
+        [class*="st-key-yidoca_panel"] {{
+            background: var(--color-bg-elev);
+            border: 1px solid var(--color-rule);
+            border-radius: 10px;
+            padding: 1.5rem 1.625rem;
+            margin-bottom: 1.25rem;
+        }}
+
         .yidoca-highlight-block {{
             background: var(--color-bg-elev);
             border-left: 3px solid var(--color-gold);
@@ -474,3 +491,63 @@ def mono_caption(texto: str) -> None:
         f'<p class="yidoca-mono">{texto}</p>',
         unsafe_allow_html=True,
     )
+
+
+def render_score(
+    valor: str | int | float,
+    denominador: str | int | float | None = None,
+    etiqueta: str | None = None,
+) -> None:
+    """
+    Cifra grande editorial, con denominador y etiqueta opcionales.
+
+    El denominador va ANIDADO dentro del número, no como hermano: su tamaño es
+    0.45em y necesita resolverse contra el número, no contra el cuerpo de texto.
+
+    No lleva delta ni indicador de tendencia a propósito. Para una nota debajo,
+    usar mono_caption(), que ya existe.
+    """
+    denom_html = (
+        f'<span class="yidoca-score-denom">/{html.escape(str(denominador))}</span>'
+        if denominador is not None
+        else ""
+    )
+    etiqueta_html = (
+        f'<div class="yidoca-score-label">{html.escape(str(etiqueta))}</div>'
+        if etiqueta
+        else ""
+    )
+    st.markdown(
+        f'<span class="yidoca-score-number">{html.escape(str(valor))}{denom_html}</span>'
+        f"{etiqueta_html}",
+        unsafe_allow_html=True,
+    )
+
+
+@contextmanager
+def panel(nombre: str):
+    """
+    Panel Yidoca: contenedor elevado con borde suave.
+
+    Envuelve st.container(border=True) en lugar de inyectar un div propio. Un
+    <div> abierto en una llamada a st.markdown y cerrado en otra NO envuelve los
+    elementos de en medio: Streamlit mete cada elemento en su propio contenedor.
+    El contenedor nativo es lo único que admite gráficos y widgets dentro, que es
+    lo que necesita una cabina de mando.
+
+    El nombre es obligatorio y debe ser ÚNICO en la página: se convierte en la
+    key del contenedor, y Streamlit lanza StreamlitDuplicateElementKey si dos
+    elementos comparten key.
+
+    De ese nombre sale la clase st-key-yidoca_panel_<nombre>, y de esa clase
+    cuelga todo el aspecto del panel: la regla [class*="st-key-yidoca_panel"]
+    de aplicar_estilo_yidoca. Es API pública de Streamlit (key -> clase CSS),
+    a diferencia de los data-testid, pero sigue siendo acoplamiento: la versión
+    de Streamlit queda fijada en todos los repos. Ver docs/adr/0002.
+
+        with panel("forecast"):
+            section_kicker("FORECAST")
+            grafico_yidoca(mi_grafico)
+    """
+    with st.container(border=True, key=f"yidoca_panel_{nombre}"):
+        yield
