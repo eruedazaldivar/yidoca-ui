@@ -11,7 +11,12 @@ YIDOCA_DIVERGENTE = ["#2F4E77", "#5E7CA4", "#97ADCB", "#DBD7CF",
 @alt.theme.register("yidoca", enable=False)
 def tema_yidoca() -> alt.theme.ThemeConfig:
     """Tema Altair de Yidoca. Se registra al importar, pero NO se activa solo."""
-    tinta, tinta_media, tinta_suave = "#141A24", "#5A6270", "#8A8F99"
+    # Las etiquetas y los títulos de eje van en tinta_media, no en la suave:
+    # #8A8F99 sobre el fondo del gráfico (#FBF8F2) da 3,06:1 y no llega al 4,5:1
+    # que el Sistema 2 exige a cualquier texto (ADR 0004). Una etiqueta de eje de
+    # 11px es texto que hay que leer, y encima proyectado. La suave se queda para
+    # lo que no es texto: dominios, marcas de eje y rejilla, que ya usan `regla`.
+    tinta, tinta_media = "#141A24", "#5A6270"
     regla, regla_suave = "#E2DCCF", "#ECE6D8"
     return alt.theme.ThemeConfig({
         "config": {
@@ -24,9 +29,9 @@ def tema_yidoca() -> alt.theme.ThemeConfig:
                       "subtitleColor": tinta_media, "subtitleFontSize": 11,
                       "subtitleFontWeight": 400},
             "axis": {"labelFont": "Inter", "labelFontSize": 11,
-                     "labelColor": tinta_suave, "labelPadding": 6,
+                     "labelColor": tinta_media, "labelPadding": 6,
                      "titleFont": "Inter", "titleFontSize": 10,
-                     "titleFontWeight": 600, "titleColor": tinta_suave,
+                     "titleFontWeight": 600, "titleColor": tinta_media,
                      "titlePadding": 10, "domainColor": regla,
                      "tickColor": regla, "tickSize": 4,
                      "gridColor": regla_suave, "gridWidth": 1},
@@ -35,7 +40,7 @@ def tema_yidoca() -> alt.theme.ThemeConfig:
             "legend": {"labelFont": "Inter", "labelFontSize": 11,
                        "labelColor": tinta_media, "titleFont": "Inter",
                        "titleFontSize": 10, "titleFontWeight": 600,
-                       "titleColor": tinta_suave, "orient": "top",
+                       "titleColor": tinta_media, "orient": "top",
                        "direction": "horizontal", "offset": 8,
                        "symbolType": "square", "symbolSize": 70},
             "line": {"strokeWidth": 2, "color": "#1E3A5F"},

@@ -47,3 +47,9 @@ Por qué esto es una librería instalable (y no CSS copiado en cada demo), por q
 Por qué panel() envuelve el contenedor nativo de Streamlit en vez de inyectar un div propio, y por qué eso ata la versión de Streamlit: ver docs/adr/0002-panel-envuelve-contenedor-nativo-streamlit.md.
 
 Por qué tabla() se escribe a mano en lugar de usar st.dataframe o st.table —el aspecto de rejilla de datos es el riesgo de posicionamiento número uno de las demos—: ver docs/adr/0003-tabla-escrita-a-mano-en-lugar-de-st-dataframe.md.
+
+Por qué todo texto va a 4,5:1 o mejor sobre su fondo, por qué las micro-etiquetas cambian a --color-ink-muted y por qué --color-ink-soft deja de ser un color de texto: ver docs/adr/0004-contraste-minimo-y-nuevo-papel-de-ink-soft.md.
+
+## Contraste
+
+Regla del Sistema 2: **cualquier texto que el espectador tenga que leer va a 4,5:1 o mejor sobre su fondo real** (ADR 0004). Sobre el crema de página #F6F2EA: `--color-ink` 15,63:1, `--color-ink-muted` 5,51:1, `--color-ink-soft` **2,91:1 — no vale para texto**. `--color-ink-soft` es solo para filetes, divisorias, bordes suaves y estados desactivados.

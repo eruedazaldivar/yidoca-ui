@@ -25,9 +25,16 @@ YIDOCA_TOKENS = """
             --color-bg-elev: #FBF8F2;
             --color-surface: #FFFFFF;
 
-            /* Texto */
+            /* Texto. Contraste medido sobre --color-bg (#F6F2EA):
+               ink 15,63:1 · ink-muted 5,51:1 · ink-soft 2,91:1 */
             --color-ink: #141A24;
             --color-ink-muted: #5A6270;
+
+            /* NO ES UN COLOR DE TEXTO. Con 2,91:1 no llega al 4,5:1 de AA ni
+               al 3:1 de texto grande, y un eyebrow de 11px a ese contraste no
+               se lee proyectado en una sala de reuniones. Su papel es todo lo
+               que no es texto: filetes, divisorias, bordes suaves y estados
+               desactivados. Para micro-etiquetas, ink-muted. Ver ADR 0004. */
             --color-ink-soft: #8A8F99;
 
             /* Bordes */
@@ -326,30 +333,34 @@ def aplicar_estilo_yidoca() -> None:
            Clases custom Yidoca
            ============================================================ */
 
-        .yidoca-eyebrow {{
+        /* Las micro-etiquetas llevan el tipo delante del selector por lo mismo
+           que p.yidoca-parrafo: .stMarkdown p las gana si no. Y van en
+           ink-muted, no en ink-soft: la jerarquía de un eyebrow la llevan el
+           tamaño, el peso, las versalitas y el letter-spacing. Ver ADR 0004. */
+        p.yidoca-eyebrow {{
             font-family: var(--font-sans);
             font-size: 0.6875rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.16em;
-            color: var(--color-ink-soft);
+            color: var(--color-ink-muted);
             margin: 0 0 0.625rem 0;
         }}
 
-        .yidoca-section-kicker {{
+        p.yidoca-section-kicker {{
             font-family: var(--font-sans);
             font-size: 0.6875rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.16em;
-            color: var(--color-ink-soft);
+            color: var(--color-ink-muted);
             margin: 2rem 0 1rem 0;
             display: flex;
             align-items: center;
             gap: 0.625rem;
         }}
 
-        .yidoca-section-kicker::after {{
+        p.yidoca-section-kicker::after {{
             content: '';
             flex: 1;
             height: 1px;
@@ -393,7 +404,7 @@ def aplicar_estilo_yidoca() -> None:
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.14em;
-            color: var(--color-ink-soft);
+            color: var(--color-ink-muted);
             background: transparent;
             padding: 0 1rem 0.75rem 1rem;
             border: none;
@@ -499,9 +510,12 @@ def aplicar_estilo_yidoca() -> None:
             color: var(--color-ink);
         }}
 
+        /* Sin tipo delante: el denominador es un <span> y la etiqueta un <div>,
+           así que .stMarkdown p no los alcanza. No se añade especificidad que
+           no hace falta. Comprobado sobre el DOM (ADR 0004). */
         .yidoca-score-denom {{
             font-size: 0.45em;
-            color: var(--color-ink-soft);
+            color: var(--color-ink-muted);
             font-weight: 500;
             letter-spacing: -0.02em;
             margin-left: 0.05em;
@@ -513,7 +527,7 @@ def aplicar_estilo_yidoca() -> None:
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            color: var(--color-ink-soft);
+            color: var(--color-ink-muted);
             margin-top: 0.625rem;
         }}
 
