@@ -36,6 +36,9 @@ oro. No son intercambiables — el de marca da 2,54:1 y no se lee (ADR 0005).
 
 `tabla()` recibe texto **ya formateado** y la alineación por columna: no formatea
 números ni adivina cuáles lo son. Las columnas numéricas van a la derecha siempre.
+Se ajusta a su contenido con un tope de 58rem y queda pegada a la izquierda, para
+que una fila se lea de un vistazo y no haya que barrer un monitor panorámico entre
+la etiqueta y su número (ADR 0006).
 
     tabla(["Comercial", "Deals", "En disputa"],
           [["Daniel Ferreras", "12", "184.200 €"],
@@ -53,6 +56,8 @@ Por qué tabla() se escribe a mano en lugar de usar st.dataframe o st.table —e
 Por qué todo texto va a 4,5:1 o mejor sobre su fondo, por qué las micro-etiquetas cambian a --color-ink-muted y por qué --color-ink-soft deja de ser un color de texto: ver docs/adr/0004-contraste-minimo-y-nuevo-papel-de-ink-soft.md.
 
 Por qué el oro se parte en dos tokens, y la regla general de cuándo un color que no pasa contraste se retira del texto y cuándo se le hace una variante del mismo tono: ver docs/adr/0005-dos-oros-gold-para-filete-gold-ink-para-texto.md.
+
+Por qué tabla() se ajusta a su contenido en lugar de estirarse al ancho de la pantalla, y por qué el recurso clásico de `width: 1%` en las columnas numéricas no sirve aquí: ver docs/adr/0006-la-tabla-se-ajusta-a-su-contenido-con-un-tope.md.
 
 ## Contraste
 

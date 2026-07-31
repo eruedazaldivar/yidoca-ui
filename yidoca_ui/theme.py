@@ -396,12 +396,22 @@ def aplicar_estilo_yidoca() -> None:
            es lo que NO lleva. Ver ADR 0003.
            ------------------------------------------------------------------ */
 
+        /* La tabla se ajusta a su contenido con un tope, en lugar de estirarse a
+           todo el ancho. En un monitor panorámico, una tabla al 100% deja medio
+           metro entre la etiqueta de una fila y su número: el ojo no los une y,
+           proyectada en una reunión, esa fila es una lectura perdida.
+           El margen derecho `auto` la deja pegada a la izquierda, alineada con
+           el resto de la columna editorial. Ver ADR 0006. */
         .yidoca-table {{
-            width: 100%;
+            width: auto;
+            /* El `100%` del min() es la salvaguarda: en una ventana estrecha la
+               tabla envuelve el texto en lugar de desbordar el contenedor y
+               sacarle barra horizontal a la página. */
+            max-width: min(58rem, 100%);
             border-collapse: collapse;
             font-family: var(--font-sans);
             font-size: 0.9375rem;
-            margin: 0.25rem 0 1.5rem 0;
+            margin: 0.25rem auto 1.5rem 0;
             background: transparent;
         }}
 
@@ -442,9 +452,15 @@ def aplicar_estilo_yidoca() -> None:
             border-bottom: none;
         }}
 
+        /* `nowrap` para que un importe no se parta en dos líneas. Sin `width`:
+           con la tabla ajustada al contenido no hay sobrante que repartir, y una
+           anchura en porcentaje aquí haría justo lo contrario —empujaría la
+           tabla hasta el tope y le daría todo el hueco a la primera columna, que
+           es el problema que se venía a arreglar—. */
         .yidoca-table .yidoca-td-derecha {{
             text-align: right;
             font-variant-numeric: tabular-nums;
+            white-space: nowrap;
         }}
 
         .yidoca-table .yidoca-td-izquierda {{
