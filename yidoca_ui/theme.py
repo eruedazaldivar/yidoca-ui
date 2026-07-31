@@ -45,7 +45,14 @@ YIDOCA_TOKENS = """
             --color-accent: #1E3A5F;
             --color-accent-deep: #0E1A33;
             --color-cream: #F1ECDF;
+
+            /* Los dos oros. Mismo tono, dos trabajos, y NO son intercambiables:
+               #B89968 da 2,41:1 sobre la página y 2,54:1 sobre un panel.
+                 --color-gold      filetes, bordes y rellenos. NUNCA texto.
+                 --color-gold-ink  cualquier texto en oro. 4,61:1 y 4,85:1.
+               Ver ADR 0005. */
             --color-gold: #B89968;
+            --color-gold-ink: #816A46;
 
             /* Tipografía */
             --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -475,19 +482,24 @@ def aplicar_estilo_yidoca() -> None:
 
         .yidoca-highlight-block {{
             background: var(--color-bg-elev);
+            /* El filete se queda en --color-gold: es borde, no texto. */
             border-left: 3px solid var(--color-gold);
             border-radius: 4px;
             padding: 1.25rem 1.5rem;
             margin: 1.75rem 0;
         }}
 
-        .yidoca-highlight-eyebrow {{
+        /* El tipo delante, por lo mismo que el eyebrow (ADR 0004): es un <p> y
+           .stMarkdown p le robaba color, tamaño y familia. Hasta hoy el bloque
+           dorado salía en Inter 15px navy, o sea sin oro ninguno. Y el oro que
+           lleva es gold-ink, no gold: en texto, el de marca da 2,54:1. */
+        p.yidoca-highlight-eyebrow {{
             font-family: var(--font-sans);
             font-size: 0.6875rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            color: var(--color-gold);
+            color: var(--color-gold-ink);
             margin: 0 0 0.625rem 0;
         }}
 
@@ -531,7 +543,10 @@ def aplicar_estilo_yidoca() -> None:
             margin-top: 0.625rem;
         }}
 
-        .yidoca-mono {{
+        /* Con el tipo delante: sin él, .stMarkdown p le quitaba las tres cosas
+           que este componente existe para poner —la monoespaciada, el tamaño
+           pequeño y el color apagado— y salía como cuerpo de texto normal. */
+        p.yidoca-mono {{
             font-family: var(--font-mono);
             font-size: 0.8125rem;
             color: var(--color-ink-muted);

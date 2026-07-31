@@ -30,7 +30,9 @@ Origen: extraído de yidoca-outreach-pipeline/core/ui_theme.py (super-demo) y pr
 | `activar_tema_graficos()` / `grafico_yidoca(g)` | Tema de Altair. |
 
 El oro (`highlight_block`) no es decorativo: solo donde hay decisión consultiva o
-recomendación. Su escasez le da peso.
+recomendación. Su escasez le da peso. Y son **dos** tokens: `--color-gold` #B89968
+para filetes, bordes y rellenos, `--color-gold-ink` #816A46 para cualquier texto en
+oro. No son intercambiables — el de marca da 2,54:1 y no se lee (ADR 0005).
 
 `tabla()` recibe texto **ya formateado** y la alineación por columna: no formatea
 números ni adivina cuáles lo son. Las columnas numéricas van a la derecha siempre.
@@ -50,6 +52,18 @@ Por qué tabla() se escribe a mano en lugar de usar st.dataframe o st.table —e
 
 Por qué todo texto va a 4,5:1 o mejor sobre su fondo, por qué las micro-etiquetas cambian a --color-ink-muted y por qué --color-ink-soft deja de ser un color de texto: ver docs/adr/0004-contraste-minimo-y-nuevo-papel-de-ink-soft.md.
 
+Por qué el oro se parte en dos tokens, y la regla general de cuándo un color que no pasa contraste se retira del texto y cuándo se le hace una variante del mismo tono: ver docs/adr/0005-dos-oros-gold-para-filete-gold-ink-para-texto.md.
+
 ## Contraste
 
-Regla del Sistema 2: **cualquier texto que el espectador tenga que leer va a 4,5:1 o mejor sobre su fondo real** (ADR 0004). Sobre el crema de página #F6F2EA: `--color-ink` 15,63:1, `--color-ink-muted` 5,51:1, `--color-ink-soft` **2,91:1 — no vale para texto**. `--color-ink-soft` es solo para filetes, divisorias, bordes suaves y estados desactivados.
+Regla del Sistema 2: **cualquier texto que el espectador tenga que leer va a 4,5:1 o mejor sobre su fondo real** (ADR 0004). Sobre el crema de página #F6F2EA:
+
+| Token | Ratio | Para texto |
+|---|---|---|
+| `--color-ink` #141A24 | 15,63:1 | sí |
+| `--color-ink-muted` #5A6270 | 5,51:1 | sí |
+| `--color-gold-ink` #816A46 | 4,61:1 | sí, el oro de texto |
+| `--color-ink-soft` #8A8F99 | 2,91:1 | **no** — filetes, divisorias, desactivados |
+| `--color-gold` #B89968 | 2,41:1 | **no** — filetes, bordes, rellenos |
+
+Un color decorativo que no pasa contraste se retira del texto; uno con carga semántica se corrige con una variante del mismo tono (ADR 0005).
