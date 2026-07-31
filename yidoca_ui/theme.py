@@ -503,7 +503,11 @@ def aplicar_estilo_yidoca() -> None:
             margin: 0 0 0.625rem 0;
         }}
 
-        .yidoca-highlight-text {{
+        /* El tipo delante por prevención, no porque hoy haga falta: esta clase
+           declara los mismos valores que .stMarkdown p, así que el choque no se
+           nota. Sin él, el día que alguien cambie aquí el color o el tamaño el
+           cambio no tendría efecto y no habría pista de por qué. Ver ADR 0005. */
+        p.yidoca-highlight-text {{
             font-family: var(--font-sans);
             font-size: 0.9375rem;
             color: var(--color-ink);

@@ -77,6 +77,42 @@ mismo tono y no un oro distinto: puestos uno al lado del otro —filete #B89968,
 texto #816A46— se leen como el mismo color a dos profundidades, no como dos
 colores.
 
+### 3. La regla que cierra el barrido de especificidad
+
+**En `yidoca-ui`, toda clase que se sirva sobre un `<p>` lleva el tipo delante,
+aunque hoy no lo necesite.** Las que van sobre `<div>`, `<span>` o `<th>`, no.
+
+Es más estricta que el criterio del ADR 0004 —"no se añade especificidad que no
+hace falta"— y no lo contradice: sigue sin añadirse especificidad a lo que
+`.stMarkdown p` no alcanza. Lo que cambia es que dentro de lo que sí alcanza no se
+espera a que el choque se note.
+
+El motivo es `.yidoca-highlight-text`, que era el último caso pendiente. Declara
+exactamente los mismos valores que la regla que la pisa —0.9375rem,
+`--color-ink`, `line-height` 1.6— así que el conflicto no se ve. Y ese es
+justamente el problema: el día que alguien cambie ahí el color o el tamaño, el
+cambio no tendrá efecto y no habrá ninguna pista de por qué. Un defecto que se
+manifiesta como "he editado el CSS y no pasa nada" cuesta mucho más de encontrar
+que uno que se ve en pantalla. Se le pone el tipo delante por prevención, sin
+cambio visual hoy.
+
+Lista actual de las seis que llevan el tipo delante:
+
+    p.yidoca-eyebrow            p.yidoca-section-kicker
+    p.yidoca-parrafo            p.yidoca-mono
+    p.yidoca-highlight-eyebrow  p.yidoca-highlight-text
+
+Y las que no lo llevan porque no les hace falta: `.yidoca-score-number` y
+`.yidoca-score-denom` (`<span>`), `.yidoca-score-label` (`<div>`), `.yidoca-table`
+y sus celdas (tabla).
+
+**Aviso sobre las dos clases sin función.** `.yidoca-panel` y `.yidoca-wordmark`
+tienen CSS pero ninguna función de la librería las emite: son estilo disponible
+para usar a mano. Quien las ponga sobre un `<p>` se encontrará exactamente con lo
+mismo —`.stMarkdown p` les robará color, tamaño y familia— y sin el tipo delante no
+habrá manera de verlo venir. Si alguna de las dos acaba teniendo función que la
+emita sobre un párrafo, entra en la lista de arriba.
+
 ## Alternativas consideradas
 
 - **Dejar el eyebrow del highlight en `--color-ink-muted` y que el oro viva solo en
@@ -123,19 +159,10 @@ por el DOM hasta el primer antecesor opaco:
 Barrido completo de clases servidas sobre un `<p>` de markdown, que son las únicas
 que `.stMarkdown p` alcanza: `yidoca-eyebrow`, `yidoca-section-kicker`,
 `yidoca-parrafo`, `yidoca-mono`, `yidoca-highlight-eyebrow` y
-`yidoca-highlight-text`. Las cinco primeras llevan ya el tipo delante.
+`yidoca-highlight-text`. **Las seis llevan ya el tipo delante**, la última por
+prevención y sin cambio visual (decisión 3).
 
-**Queda una, y se deja a propósito.** `.yidoca-highlight-text` es un `<p>` con clase
-suelta, así que también la pisa `.stMarkdown p` — pero declara exactamente los
-mismos valores que la regla que la pisa (0.9375rem, `--color-ink`, `line-height`
-1.6), así que hoy no se nota. Es una trampa latente: el día que alguien cambie el
-color o el tamaño de esa clase, el cambio no tendrá efecto y no habrá pista de por
-qué. Se toca cuando haya motivo para tocarla, no antes.
-
-`.yidoca-score-number`, `.yidoca-score-denom` y `.yidoca-score-label` son `<span>`,
-`<span>` y `<div>`; `.yidoca-table` y sus celdas son tabla. Ninguna la alcanza
-`.stMarkdown p`. `.yidoca-panel` y `.yidoca-wordmark` no las emite ninguna función:
-son CSS disponible para quien lo quiera usar a mano, y si alguien las pone sobre un
-`<p>` se encontrará con lo mismo.
+Con eso el barrido queda cerrado: no queda en la librería ninguna clase servida
+sobre un `<p>` sin el tipo delante.
 
 Versiones sobre las que se validó: Streamlit 1.58.0.
