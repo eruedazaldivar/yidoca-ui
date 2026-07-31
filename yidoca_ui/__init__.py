@@ -5,9 +5,11 @@ from yidoca_ui.theme import (
     aplicar_estilo_yidoca,
     eyebrow,
     section_kicker,
+    parrafo,
     highlight_block,
     mono_caption,
     render_score,
+    tabla,
     panel,
 )
 from yidoca_ui.graficos import (
@@ -21,9 +23,11 @@ __all__ = [
     "aplicar_estilo_yidoca",
     "eyebrow",
     "section_kicker",
+    "parrafo",
     "highlight_block",
     "mono_caption",
     "render_score",
+    "tabla",
     "panel",
     "tema_yidoca",
     "activar_tema_graficos",

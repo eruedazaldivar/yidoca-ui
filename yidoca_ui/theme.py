@@ -356,6 +356,90 @@ def aplicar_estilo_yidoca() -> None:
             background: var(--color-rule-soft);
         }}
 
+        /* Párrafo de contexto: el que va bajo un section_kicker y explica de
+           dónde salen las cifras que vienen debajo.
+
+           El selector lleva el tipo delante (p.yidoca-parrafo) a propósito. La
+           regla .stMarkdown p de más arriba fija color y line-height con la
+           misma especificidad que una clase suelta, y ganaría por ser anterior.
+           Con el tipo empatan y decide el orden, que aquí nos favorece. */
+        p.yidoca-parrafo {{
+            font-family: var(--font-sans);
+            font-size: 0.9375rem;
+            line-height: 1.65;
+            color: var(--color-ink-muted);
+            max-width: 62ch;
+            margin: 0 0 1rem 0;
+        }}
+
+        /* ------------------------------------------------------------------
+           Tabla editorial (guía 7.5). Sin bordes verticales, sin zebra, sin
+           fondo de fila: lo que separa una tabla Yidoca de una rejilla de datos
+           es lo que NO lleva. Ver ADR 0003.
+           ------------------------------------------------------------------ */
+
+        .yidoca-table {{
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-sans);
+            font-size: 0.9375rem;
+            margin: 0.25rem 0 1.5rem 0;
+            background: transparent;
+        }}
+
+        .yidoca-table th {{
+            font-family: var(--font-sans);
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--color-ink-soft);
+            background: transparent;
+            padding: 0 1rem 0.75rem 1rem;
+            border: none;
+            border-bottom: 1px solid var(--color-rule);
+            white-space: nowrap;
+            vertical-align: bottom;
+        }}
+
+        .yidoca-table td {{
+            /* Altura de fila generosa: esto se lee proyectado, a tres metros. */
+            padding: 1rem;
+            border: none;
+            border-bottom: 1px solid var(--color-rule-soft);
+            color: var(--color-ink);
+            line-height: 1.45;
+            background: transparent;
+        }}
+
+        .yidoca-table th:first-child, .yidoca-table td:first-child {{
+            padding-left: 0;
+        }}
+
+        .yidoca-table th:last-child, .yidoca-table td:last-child {{
+            padding-right: 0;
+        }}
+
+        .yidoca-table tbody tr:last-child td {{
+            border-bottom: none;
+        }}
+
+        .yidoca-table .yidoca-td-derecha {{
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }}
+
+        .yidoca-table .yidoca-td-izquierda {{
+            text-align: left;
+        }}
+
+        /* Fila de total: la declara quien llama, no se adivina. */
+        .yidoca-table tr.yidoca-fila-total td {{
+            border-top: 2px solid var(--color-rule);
+            font-weight: 600;
+            color: var(--color-ink);
+        }}
+
         .yidoca-panel {{
             background: var(--color-bg-elev);
             border: 1px solid var(--color-rule);
@@ -464,6 +548,91 @@ def section_kicker(texto: str) -> None:
     """Renderiza un section kicker con línea decorativa. 'TÍTULO ────────'."""
     st.markdown(
         f'<p class="yidoca-section-kicker">{texto}</p>',
+        unsafe_allow_html=True,
+    )
+
+
+def parrafo(texto: str) -> None:
+    """
+    Párrafo de contexto: el que va bajo un section_kicker y dice de dónde salen
+    las cifras que vienen debajo.
+
+    Cuerpo pequeño, color apagado y medida corta —62 caracteres— para que se lea
+    de un vistazo. No lleva parámetros de color ni de ancho: el día que haga
+    falta una variante se añade, y hasta entonces un parámetro que nadie usa es
+    deuda.
+
+        section_kicker("EL PIPELINE A 29 DE JULIO DE 2026")
+        parrafo("Foto del CRM con 44 operaciones abiertas.")
+    """
+    st.markdown(
+        f'<p class="yidoca-parrafo">{html.escape(texto)}</p>',
+        unsafe_allow_html=True,
+    )
+
+
+def tabla(cabeceras: list[str],
+          filas: list[list[str]],
+          alineacion: list[str] | None = None,
+          ultima_fila_total: bool = False) -> None:
+    """
+    Tabla editorial Yidoca. HTML propio, no `st.dataframe` ni `st.table`.
+
+    Recibe **texto ya formateado**. La tabla no formatea números: quien llama es
+    quien sabe si son euros, días o unidades, y quien conoce el criterio de
+    redondeo de su demo.
+
+    `alineacion` lleva "izquierda" o "derecha" por columna; por defecto todo a la
+    izquierda. **Las columnas numéricas van a la derecha siempre**: una columna de
+    importes alineada a la izquierda no se lee de un vistazo, que es el único uso
+    que tiene una tabla en una demo. Las de la derecha llevan además cifras de
+    ancho fijo, para que las unidades caigan una debajo de otra.
+
+    `ultima_fila_total` marca la última fila con una línea superior más marcada y
+    negrita. Se declara, no se adivina: una tabla de cuatro filas donde la cuarta
+    resulta ser un total y una donde no lo es se escriben igual.
+
+    No hay scroll, ni ordenación por clic, ni paginación. Es una tabla para mirar,
+    no para operar; quien necesite operar necesita otra cosa (ADR 0003).
+
+        tabla(["Comercial", "Deals", "En disputa"],
+              [["Daniel Ferreras", "12", "184.200 €"],
+               ["Marta Iglesias", "9", "-31.400 €"]],
+              alineacion=["izquierda", "derecha", "derecha"])
+    """
+    n = len(cabeceras)
+    if alineacion is None:
+        alineacion = ["izquierda"] * n
+    if len(alineacion) != n:
+        raise ValueError(
+            f"alineacion tiene {len(alineacion)} entradas y hay {n} columnas.")
+    for valor in alineacion:
+        if valor not in ("izquierda", "derecha"):
+            raise ValueError(
+                f'alineacion solo admite "izquierda" o "derecha", no {valor!r}.')
+    for i, fila in enumerate(filas):
+        if len(fila) != n:
+            raise ValueError(
+                f"la fila {i} tiene {len(fila)} celdas y hay {n} columnas.")
+
+    clases = [f"yidoca-td-{lado}" for lado in alineacion]
+
+    cabecera = "".join(f'<th class="{clase}">{html.escape(str(texto))}</th>'
+                       for clase, texto in zip(clases, cabeceras))
+
+    cuerpo = []
+    for i, fila in enumerate(filas):
+        es_total = ultima_fila_total and i == len(filas) - 1
+        clase_fila = ' class="yidoca-fila-total"' if es_total else ""
+        celdas = "".join(f'<td class="{clase}">{html.escape(str(celda))}</td>'
+                         for clase, celda in zip(clases, fila))
+        cuerpo.append(f"<tr{clase_fila}>{celdas}</tr>")
+
+    # Sin saltos de línea ni sangrado: el markdown de Streamlit trata una línea
+    # sangrada como bloque de código y partiría la tabla por la mitad.
+    st.markdown(
+        f'<table class="yidoca-table"><thead><tr>{cabecera}</tr></thead>'
+        f'<tbody>{"".join(cuerpo)}</tbody></table>',
         unsafe_allow_html=True,
     )
 
