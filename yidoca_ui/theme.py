@@ -523,6 +523,17 @@ def aplicar_estilo_yidoca() -> None:
            declara los mismos valores que .stMarkdown p, así que el choque no se
            nota. Sin él, el día que alguien cambie aquí el color o el tamaño el
            cambio no tendría efecto y no habría pista de por qué. Ver ADR 0005. */
+        /* La medida, acotada a 68ch. El componente nació para una frase corta
+           —el cierre de la Demo B— y a ancho completo de una página de 1440 px
+           son 176 caracteres por línea, medidos sobre el DOM. La medida cómoda
+           está entre 60 y 75; los párrafos del sistema van a 62. Un bloque que
+           ocupa cuatro líneas de 176 caracteres es exactamente donde el ojo
+           pierde el renglón al volver a la izquierda.
+
+           Se acorta SOLO la línea de texto: el borde dorado y el fondo siguen
+           ocupando el ancho completo, que es lo que le da al bloque su peso en
+           la página. Y la cursiva se queda, porque a 68 caracteres se lee bien
+           y es parte de la identidad del componente. */
         p.yidoca-highlight-text {{
             font-family: var(--font-sans);
             font-size: 0.9375rem;
@@ -530,6 +541,7 @@ def aplicar_estilo_yidoca() -> None:
             line-height: 1.6;
             font-style: italic;
             margin: 0;
+            max-width: 68ch;
         }}
 
         .yidoca-score-number {{
