@@ -12,8 +12,11 @@ Decisiones aplicadas:
    yidoca-highlight-block.
 """
 
+import base64
 import html
 from contextlib import contextmanager
+from functools import lru_cache
+from pathlib import Path
 
 import streamlit as st
 
@@ -62,19 +65,73 @@ YIDOCA_TOKENS = """
 """
 
 
+#: Las siete caras que usa el sistema, con el fichero que las sirve.
+#: (fichero, familia CSS, peso, estilo)
+_CARAS = (
+    ("inter-400.woff2", "Inter", 400, "normal"),
+    ("inter-500.woff2", "Inter", 500, "normal"),
+    ("inter-600.woff2", "Inter", 600, "normal"),
+    ("instrument-serif-400.woff2", "Instrument Serif", 400, "normal"),
+    ("instrument-serif-400-italic.woff2", "Instrument Serif", 400, "italic"),
+    ("jetbrains-mono-400.woff2", "JetBrains Mono", 400, "normal"),
+    ("jetbrains-mono-500.woff2", "JetBrains Mono", 500, "normal"),
+)
+
+
+@lru_cache(maxsize=1)
+def _css_fuentes() -> str:
+    """
+    Los `@font-face` con los woff2 embebidos en base64.
+
+    POR QUÉ EMBEBIDAS Y NO SERVIDAS DESDE UN FICHERO. Streamlit no expone un
+    directorio de estáticos que una librería instalada pueda usar sin que cada
+    demo lo configure, y lo que funciona en local tiene que funcionar igual en
+    Streamlit Cloud. Un `data:` URI dentro del propio CSS que ya se inyecta no
+    depende de nada: ni de rutas, ni de servidor de estáticos, ni de red.
+
+    POR QUÉ NO GOOGLE FONTS, que es de donde venían. Dos motivos y los dos pesan:
+    sin red —el pabellón de una feria— la página cae a las fuentes del sistema y
+    cambia de aspecto delante del cliente; y una consultora que entra en la red
+    de un cliente no debería estar pidiéndole tres ficheros a un tercero.
+
+    `font-display: block` y no `swap`: con las fuentes embebidas no hay descarga
+    que esperar, así que no existe el parpadeo que `swap` viene a evitar, y
+    `block` elimina el destello de fuente del sistema en el primer pintado.
+
+    Se cachea porque son ~171 KB de base64 y `aplicar_estilo_yidoca()` se llama
+    en cada reejecución del script de Streamlit, que son muchas.
+    """
+    directorio = Path(__file__).resolve().parent / "fuentes"
+    bloques = []
+    for fichero, familia, peso, estilo in _CARAS:
+        ruta = directorio / fichero
+        if not ruta.exists():          # pragma: no cover - empaquetado incompleto
+            continue
+        datos = base64.b64encode(ruta.read_bytes()).decode("ascii")
+        bloques.append(f"""
+        @font-face {{
+            font-family: '{familia}';
+            font-style: {estilo};
+            font-weight: {peso};
+            font-display: block;
+            src: url(data:font/woff2;base64,{datos}) format('woff2');
+        }}""")
+    return "\n".join(bloques)
+
+
 def aplicar_estilo_yidoca() -> None:
     """
     Inyecta el CSS Yidoca en la página actual de Streamlit.
 
     Llamar al inicio de cada página, justo después de st.set_page_config().
+
+    **No hace ni una petición a un tercero.** Las tres familias viajan dentro del
+    paquete y se embeben aquí; ver `_css_fuentes()`.
     """
     st.markdown(
         f"""
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
         <style>
+        {_css_fuentes()}
         /* ============================================================
            Variables CSS canónicas Yidoca (Sistema 2)
            ============================================================ */

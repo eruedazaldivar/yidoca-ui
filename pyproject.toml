@@ -1,6 +1,6 @@
 [project]
 name = "yidoca-ui"
-version = "0.1.0"
+version = "1.0.0"
 description = "Sistema de diseño compartido de Yidoca para demos en Streamlit"
 requires-python = ">=3.12"
 dependencies = ["streamlit>=1.30", "altair>=5.5"]
@@ -12,3 +12,10 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["yidoca_ui*"]
+
+# Las fuentes viajan DENTRO del paquete. Sin esto, una instalación desde git
+# dejaría `yidoca_ui/fuentes` vacío y el tema caería a las fuentes del sistema
+# **en silencio**: exactamente el fallo que este empaquetado viene a evitar, y
+# de los que no se ven hasta que estás delante del cliente.
+[tool.setuptools.package-data]
+yidoca_ui = ["fuentes/*.woff2", "fuentes/*.txt"]
